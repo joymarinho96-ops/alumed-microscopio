@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alumed NEO - Microscópio Inteligente</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        body {
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a0a2e 50%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            gap: 0;
+        }
+
+        .sidebar {
+            width: 380px;
+            background: linear-gradient(135deg, rgba(10, 10, 26, 0.95) 0%, rgba(26, 10, 46, 0.95) 100%);
+            border-right: 2px solid #00ff88;
+            overflow-y: auto;
+            padding: 20px;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.2);
+        }
+
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #000;
+            position: relative;
+        }
+
+        .header {
+            padding: 20px;
+            border-bottom: 2px solid #00ffff;
+            background: linear-gradient(90deg, rgba(0, 255, 136, 0.1) 0%, rgba(0, 255, 255, 0.1) 100%);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #00ff88;
+            text-shadow: 0 0 10px #00ff88, 0 0 20px #00ffff;
+            margin: 0;
+        }
+
+        .header p {
+            color: #00ffff;
+            font-size: 12px;
+            margin: 5px 0 0 0;
+            text-shadow: 0 0 5px #00ffff;
+        }
+
+        .viewer {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #00ffff;
+            font-size: 18px;
+            text-align: center;
+            padding: 40px;
+            text-shadow: 0 0 10px #00ffff;
+            position: relative;
+        }
+
+        .image-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        #lamina-viewer {
+            max-width: 95%;
+            max-height: 90%;
+            object-fit: contain;
+            background: #000;
+            border: 2px solid #00ff88;
+            border-radius: 8px;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.4);
+        }
+
+        .lamina-selector {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+            background: rgba(0, 10, 20, 0.8);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #00ffff;
+        }
+
+        .lamina-thumb {
+            cursor: pointer;
+            border: 2px solid #444;
+            border-radius: 4px;
+            overflow: hidden;
+            aspect-ratio: 1;
+            transition: all 0.3s ease;
+        }
+
+        .lamina-thumb:hover {
+            border-color: #00ff88;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+        }
+
+        .lamina-thumb.active {
+            border-color: #00ff88;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.8);
+        }
+
+        .lamina-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .section {
+            margin-bottom: 25px;
+        }
+
+        .section h2 {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #00ff88;
+            text-shadow: 0 0 5px #00ff88;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .color-box {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            box-shadow: 0 0 10px currentColor;
+        }
+
+        .color-box:hover {
+            transform: scale(1.1);
+            border-color: #fff;
+            box-shadow: 0 0 20px currentColor;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 2px solid #00ffff;
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1) 0%, rgba(0, 255, 255, 0.1) 100%);
+            color: #00ffff;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 0 5px #00ffff;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #00ff88 0%, #00ffff 100%);
+            box-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff;
+            color: #000;
+            text-shadow: none;
+            border-color: #00ffff;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+            margin: 0;
+        }
+
+        .tool-btn {
+            padding: 10px;
+            border: 2px solid rgba(0, 255, 136, 0.3);
+            background: rgba(0, 255, 136, 0.05);
+            color: #00ffff;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .tool-btn:hover {
+            border-color: #00ffff;
+            background: rgba(0, 255, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+        }
+
+        .tool-btn.active {
+            background: linear-gradient(135deg, #00ff88 0%, #00ffff 100%);
+            border-color: #00ff88;
+            color: #000;
+            font-weight: 700;
+            box-shadow: 0 0 20px #00ffff;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: #00ff88;
+            cursor: pointer;
+        }
+
+        .info-box {
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px solid #00ff88;
+            border-radius: 6px;
+            padding: 10px;
+            font-size: 12px;
+            color: #00ffff;
+            margin: 10px 0;
+            text-shadow: 0 0 3px #00ffff;
+        }
+
+        .controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 100;
+        }
+
+        .control-btn {
+            width: 45px;
+            height: 45px;
+            border: 2px solid #00ffff;
+            background: rgba(0, 255, 255, 0.1);
+            color: #00ffff;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-btn:hover {
+            background: #00ffff;
+            color: #000;
+            box-shadow: 0 0 20px #00ffff;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 255, 136, 0.05);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #00ff88;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00ffff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="section">
+                <h1 style="font-size: 24px; margin-bottom: 5px;">Alumed NEO</h1>
+                <p style="color: #00ffff; font-size: 11px; text-shadow: 0 0 5px #00ffff; margin: 0;">v3.0 • CYBER EDITION</p>
+            </div>
+
+            <div class="section">
+                <h2>📄 Lâmina Carregada</h2>
+                <div class="info-box">
+                    <strong>Cardioesophageal Junction</strong><br>
+                    Coloração: HE • Magnificação: 10x
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>🎨 Ferramentas</h2>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+                    <button class="tool-btn active" title="Caneta (P)"><i class="fas fa-pen"></i></button>
+                    <button class="tool-btn" title="Borracha (E)"><i class="fas fa-eraser"></i></button>
+                    <button class="tool-btn" title="Círculo (C)"><i class="fas fa-circle"></i></button>
+                    <button class="tool-btn" title="Retângulo (R)"><i class="fas fa-square"></i></button>
+                    <button class="tool-btn" title="Seta (A)"><i class="fas fa-arrow-right"></i></button>
+                    <button class="tool-btn" title="Limpar (L)"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>🌈 Cores Neon</h2>
+                <div class="color-grid">
+                    <div class="color-box" style="background: #00ff88;"></div>
+                    <div class="color-box" style="background: #00ffff;"></div>
+                    <div class="color-box" style="background: #ff006e;"></div>
+                    <div class="color-box" style="background: #ffbe0b;"></div>
+                    <div class="color-box" style="background: #8338ec;"></div>
+                    <div class="color-box" style="background: #ffffff;"></div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>✏️ Espessura</h2>
+                <input type="range" min="1" max="20" value="3" style="margin-bottom: 8px;">
+                <p style="text-align: center; font-size: 11px; color: #00ffff; margin: 0;">3px</p>
+            </div>
+
+            <div class="section">
+                <h2>🔄 Histórico</h2>
+                <div class="btn-group">
+                    <button class="btn" style="flex: 1; border-color: #3b82f6; color: #3b82f6; text-shadow: 0 0 5px #3b82f6;">
+                        <i class="fas fa-undo"></i> Desfazer
+                    </button>
+                    <button class="btn" style="flex: 1; border-color: #10b981; color: #10b981; text-shadow: 0 0 5px #10b981;">
+                        <i class="fas fa-redo"></i> Refazer
+                    </button>
+                </div>
+                <p style="text-align: center; font-size: 10px; color: #00ffff; margin: 8px 0 0 0;">Passo: 1 / 20</p>
+            </div>
+
+            <div class="section">
+                <h2>⚙️ Ações</h2>
+                <button class="btn" style="border-color: #ffbe0b; color: #ffbe0b; text-shadow: 0 0 5px #ffbe0b;">
+                    <i class="fas fa-lock-open"></i> Destravar Desenho
+                </button>
+                <button class="btn" style="border-color: #8338ec; color: #8338ec; text-shadow: 0 0 5px #8338ec;">
+                    <i class="fas fa-download"></i> Salvar Desenho
+                </button>
+            </div>
+
+            <div class="section">
+                <h2>🔬 Estruturas Mapeadas</h2>
+                <button class="btn">Vilosidades Intestinais</button>
+                <button class="btn">Criptas de Lieberkühn</button>
+                <button class="btn" style="border-color: #ff006e; color: #ff006e; text-shadow: 0 0 5px #ff006e;">
+                    <i class="fas fa-bolt"></i> Analisar com IA
+                </button>
+            </div>
+        </div>
+
+        <!-- MAIN VIEWER -->
+        <div class="main">
+            <div class="header">
+                <h1><i class="fas fa-microscope"></i> Alumed NEO v3.0</h1>
+                <p>Microscopia Inteligente com Ferramentas Avançadas</p>
+            </div>
+
+            <div class="viewer">
+                <div class="image-container">
+                    <img id="lamina-viewer" src="imagens_laminas/lamina_0.jpg">
+                </div>
+                
+                <!-- Seletor de 25 Lâminas Leeds + Originals -->
+                <div class="lamina-selector" id="lamina-selector">
+                    <div class="lamina-thumb active" data-src="imagens_laminas/lamina_0.jpg" title="Cardioesophageal">
+                        <img src="imagens_laminas/lamina_0.jpg" alt="Original">
+                    </div>
+                    <div class="lamina-thumb" data-src="imagens_laminas/lamina_leeds_001.png" title="Estômago 1"><img src="imagens_laminas/lamina_leeds_001.png"></div>
+                    <div class="lamina-thumb" data-src="imagens_laminas/lamina_leeds_002.png" title="Estômago 2"><img src="imagens_laminas/lamina_leeds_002.png"></div>
+                    <div class="lamina-thumb" data-src="imagens_laminas/lamina_leeds_003.png" title="Int. Delg. 1"><img src="imagens_laminas/lamina_leeds_003.png"></div>
+                    <div class="lamina-thumb" data-src="imagens_laminas/lamina_leeds_004.png" title="Int. Delg. 2"><img src="imagens_laminas/lamina_leeds_004.png"></div>
+                    <div class="lamina-thumb" data-src="imagens_laminas/lamina_leeds_005.jpg" title="Int. Delg. 3"><img src="imagens_laminas/lamina_leeds_005.jpg"></div>
+                    <div class="lamina-thumb" data-src="imagens_laminas/lamina_leeds_006.jpg" title="Int. Delg. 4"><img src="imagens_laminas/lamina_leeds_006.jpg"></div>
+                    <div class="lamina-thumb" data-src="imagens_laminas/lamina_leeds_007.png" title="Fígado 1"><img src="imagens_laminas/lamina_leeds_007.png"></div>
+                    <div class="lamina-thumb" data-src="imagens_laminas/lamina_leeds_008.png" title="Fígado 2"><img src="imagens_laminas/lamina_leeds_008.png"></div>
+                    <div class="lamina-thumb" data-src="imagens_laminas/lamina_leeds_009.jpg" title="Vesícula"><img src="imagens_laminas/lamina_leeds_009.jpg"></div>
+                    <div class="lamina-thumb" data-src="imagens_laminas/lamina_leeds_010.jpg" title="Apêndice"><img src="imagens_laminas/lamina_leeds_010.jpg"></div>
+                    <div class="lamina-thumb" data-src="imagens_laminas/lamina_leeds_011.jpg" title="Plaquetas"><img src="imagens_laminas/lamina_leeds_011.jpg"></div>
+                    <div class="lamina-thumb" data-src="imagens_laminas/lamina_leeds_012.png" title="Cabelo"><img src="imagens_laminas/lamina_leeds_012.png"></div>
+                    <div class="lamina-thumb" data-src="imagens_laminas/lamina_leeds_013.png" title="Artérias 1"><img src="imagens_laminas/lamina_leeds_013.png"></div>
+                    <div class="lamina-thumb" data-src="imagens_laminas/lamina_leeds_014.jpg" title="Artérias 2"><img src="imagens_laminas/lamina_leeds_014.jpg"></div>
+                    <div class="lamina-thumb" data-src="imagens_laminas/lamina_leeds_015.png" title="Vasos 1"><img src="imagens_laminas/lamina_leeds_015.png"></div>
+                    <div class="lamina-thumb" data-src="imagens_laminas/lamina_leeds_016.jpg" title="Capilares 1"><img src="imagens_laminas/lamina_leeds_016.jpg"></div>
+                    <div class="lamina-thumb" data-src="imagens_laminas/lamina_leeds_017.png" title="Capilares 2"><img src="imagens_laminas/lamina_leeds_017.png"></div>
+                    <div class="lamina-thumb" data-src="imagens_laminas/lamina_leeds_018.jpg" title="Capilares 3"><img src="imagens_laminas/lamina_leeds_018.jpg"></div>
+                    <div class="lamina-thumb" data-src="imagens_laminas/lamina_leeds_019.png" title="Glomeruli"><img src="imagens_laminas/lamina_leeds_019.png"></div>
+                    <div class="lamina-thumb" data-src="imagens_laminas/lamina_leeds_020.png" title="Capilares Fenes"><img src="imagens_laminas/lamina_leeds_020.png"></div>
+                    <div class="lamina-thumb" data-src="imagens_laminas/lamina_leeds_021.jpg" title="Capilares EM"><img src="imagens_laminas/lamina_leeds_021.jpg"></div>
+                    <div class="lamina-thumb" data-src="imagens_laminas/lamina_leeds_022.png" title="Capilares Disc"><img src="imagens_laminas/lamina_leeds_022.png"></div>
+                </div>
+            </div>
+
+            <!-- Controles -->
+            <div class="controls">
+                <button class="control-btn" title="Zoom In (+)"><i class="fas fa-plus"></i></button>
+                <button class="control-btn" title="Home (H)"><i class="fas fa-home"></i></button>
+                <button class="control-btn" title="Zoom Out (-)"><i class="fas fa-minus"></i></button>
+                <button class="control-btn" title="Fullscreen (F)"><i class="fas fa-expand"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('🚀 Alumed NEO v3.0 Carregado!');
+        console.log('📝 Atalhos: P=Caneta, E=Borracha, Ctrl+Z=Desfazer, F=Fullscreen');
+        
+        // Seletor de Lâminas
+        document.querySelectorAll('.lamina-thumb').forEach(thumb => {
+            thumb.addEventListener('click', function() {
+                const src = this.dataset.src;
+                document.getElementById('lamina-viewer').src = src;
+                
+                // Update active state
+                document.querySelectorAll('.lamina-thumb').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
