@@ -145,20 +145,93 @@
             animation: neonFlicker 3s ease-in-out infinite;
         }
         
-        @keyframes neonFlicker {
+        @keyframes glitch {
             0%, 100% { 
+                clip-path: inset(0 0 0 0);
                 text-shadow: 
                     0 0 10px #00ff88,
                     0 0 20px #00ffff,
                     0 0 30px #00ffff;
-                opacity: 1;
+            }
+            20% { 
+                clip-path: inset(10% 0 20% 0);
+                text-shadow: 
+                    -2px 0 #ff006e,
+                    2px 0 #00ffff,
+                    0 0 10px #00ff88;
+            }
+            40% { 
+                clip-path: inset(5% 0 10% 0);
+                text-shadow: 
+                    -4px 0 #00ffff,
+                    4px 0 #ff006e,
+                    0 0 20px #ffbe0b;
+            }
+            60% { 
+                clip-path: inset(8% 0 15% 0);
+                text-shadow: 
+                    -2px 2px #ff006e,
+                    2px -2px #00ffff,
+                    0 0 10px #00ff88;
+            }
+            80% { 
+                clip-path: inset(3% 0 5% 0);
+                text-shadow: 
+                    0 0 10px #00ff88,
+                    0 0 20px #00ffff,
+                    0 0 30px #00ffff;
+            }
+        }
+        
+        @keyframes colorPulse {
+            0%, 100% { 
+                color: #00ff88;
+                text-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88;
+            }
+            25% { 
+                color: #00ffff;
+                text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
             }
             50% { 
-                text-shadow: 
-                    0 0 5px #00ff88,
-                    0 0 10px #00ffff;
-                opacity: 0.9;
+                color: #ffbe0b;
+                text-shadow: 0 0 10px #ffbe0b, 0 0 20px #ffbe0b;
             }
+            75% { 
+                color: #ff006e;
+                text-shadow: 0 0 10px #ff006e, 0 0 20px #ff006e;
+            }
+        }
+        
+        @keyframes borderPulse {
+            0%, 100% { 
+                border-color: #00ff88;
+                box-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88;
+            }
+            25% { 
+                border-color: #00ffff;
+                box-shadow: 0 0 15px #00ffff, 0 0 30px #00ffff;
+            }
+            50% { 
+                border-color: #ffbe0b;
+                box-shadow: 0 0 15px #ffbe0b, 0 0 30px #ffbe0b;
+            }
+            75% { 
+                border-color: #ff006e;
+                box-shadow: 0 0 15px #ff006e, 0 0 30px #ff006e;
+            }
+        }
+        
+        .glitch-text {
+            animation: glitch 0.3s ease infinite;
+            position: relative;
+        }
+        
+        .pulse-text {
+            animation: colorPulse 4s ease-in-out infinite;
+        }
+        
+        .pulse-border {
+            animation: borderPulse 3s ease-in-out infinite;
         }
         
         /* ========== SECTIONS ========== */
@@ -302,10 +375,10 @@
                     <i class="fas fa-microscope text-black font-bold"></i>
                 </div>
                 <div>
-                    <h1 class="text-2xl font-bold text-lime-400">
+                    <h1 class="text-2xl font-bold text-lime-400 glitch-text">
                         Alumed NEO
                     </h1>
-                    <p class="text-xs text-cyan-400" style="text-shadow: 0 0 5px #00ffff;">v3.0 • CYBER</p>
+                    <p class="text-xs text-cyan-400 pulse-text" style="text-shadow: 0 0 5px #00ffff;">v3.0 • CYBER</p>
                 </div>
             </div>
         </div>
@@ -340,8 +413,16 @@
                     <button onclick="setTool('arrow')" class="tool-btn p-3 rounded-lg bg-slate-700 border border-slate-600 hover:border-teal-500/30 tooltip" data-tooltip="Seta (A)">
                         <i class="fas fa-arrow-right text-cyan-300"></i>
                     </button>
-                    <button onclick="clearDrawing()" class="tool-btn p-3 rounded-lg bg-red-500/20 border border-red-500/30 hover:bg-red-500/30 tooltip" data-tooltip="Limpar (C+L)">
+                    <button onclick="clearDrawing()" class="tool-btn p-3 rounded-lg bg-red-500/20 border border-red-500/30 hover:bg-red-500/30 tooltip" data-tooltip="Limpar (L)">
                         <i class="fas fa-trash text-red-400"></i>
+                    </button>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="toggleDrawingLock()" id="lock-btn" class="flex-1 p-2 rounded-lg bg-yellow-500/20 border border-yellow-500/30 text-yellow-400 text-xs font-bold hover:bg-yellow-500/30 transition tooltip" data-tooltip="Travar Desenho (K)">
+                        <i class="fas fa-lock-open"></i> Destravar
+                    </button>
+                    <button onclick="downloadDrawing()" class="flex-1 p-2 rounded-lg bg-purple-500/20 border border-purple-500/30 text-purple-400 text-xs font-bold hover:bg-purple-500/30 transition tooltip" data-tooltip="Salvar Desenho (S)">
+                        <i class="fas fa-download"></i> Salvar
                     </button>
                 </div>
             </div>
@@ -462,9 +543,10 @@
     <script type="text/javascript">
         // ============= VARIÁVEIS GLOBAIS =============
         let currentTool = 'pen';
-        let currentColor = '#14b8a6';
+        let currentColor = '#00ff88';
         let brushSize = 3;
         let isDrawing = false;
+        let isDrawingLocked = false;
         let startX, startY;
 
         // ============= INICIALIZAÇÃO DO OPENSEADRAGON =============
@@ -501,6 +583,7 @@
 
         // ============= FUNÇÕES DE DESENHO =============
         canvas.addEventListener('mousedown', (e) => {
+            if (isDrawingLocked) return;
             isDrawing = true;
             startX = e.clientX;
             startY = e.clientY;
@@ -516,6 +599,7 @@
             ctx.lineWidth = brushSize;
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
+            ctx.fillStyle = currentColor;
 
             if (currentTool === 'pen') {
                 ctx.globalCompositeOperation = 'source-over';
@@ -558,6 +642,32 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
 
+        function toggleDrawingLock() {
+            isDrawingLocked = !isDrawingLocked;
+            const lockBtn = document.getElementById('lock-btn');
+            
+            if (isDrawingLocked) {
+                lockBtn.innerHTML = '<i class="fas fa-lock"></i> Travado';
+                lockBtn.classList.add('pulse-border');
+                lockBtn.style.background = 'linear-gradient(135deg, #ff006e/30, #8338ec/30)';
+                lockBtn.style.borderColor = '#ff006e';
+                canvas.style.pointerEvents = 'none';
+            } else {
+                lockBtn.innerHTML = '<i class="fas fa-lock-open"></i> Destravar';
+                lockBtn.classList.remove('pulse-border');
+                lockBtn.style.background = 'linear-gradient(135deg, #ffbe0b/20, #8338ec/20)';
+                lockBtn.style.borderColor = 'rgba(251, 191, 11, 0.3)';
+                canvas.style.pointerEvents = 'auto';
+            }
+        }
+
+        function downloadDrawing() {
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL('image/png');
+            link.download = 'desenho_lamina_' + new Date().getTime() + '.png';
+            link.click();
+        }
+
         // ============= SLIDER DE ESPESSURA =============
         document.getElementById('brush-size').addEventListener('input', (e) => {
             brushSize = e.target.value;
@@ -597,6 +707,9 @@
             if (e.key === 'c' || e.key === 'C') setTool('circle');
             if (e.key === 'r' || e.key === 'R') setTool('rectangle');
             if (e.key === 'a' || e.key === 'A') setTool('arrow');
+            if (e.key === 'k' || e.key === 'K') toggleDrawingLock();
+            if (e.key === 'l' || e.key === 'L') clearDrawing();
+            if (e.key === 's' || e.key === 'S') downloadDrawing();
             if (e.key === 'h' || e.key === 'H') viewer.viewport.goHome();
             if (e.key === 'f' || e.key === 'F') toggleFullscreen();
             if (e.key === '+' || e.key === '=') viewer.viewport.zoomBy(1.2);
@@ -604,8 +717,8 @@
         });
 
         // ============= INICIALIZAÇÃO =============
-        console.log('🚀 Alumed Pro v2.0 iniciado!');
-        console.log('📝 Atalhos: P=Caneta, E=Borracha, C=Círculo, R=Retângulo, A=Seta, H=Home, F=Fullscreen');
+        console.log('🚀 Alumed NEO v3.0 - NEON EDITION');
+        console.log('📝 Atalhos: P=Pen, E=Eraser, C=Circle, R=Rectangle, A=Arrow, K=Lock, L=Clear, S=Save, H=Home, F=Fullscreen');
 
     </script>
 </body>
