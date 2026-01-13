@@ -1,0 +1,130 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alumed Deep Zoom Microscope</title>
+    <style>
+        :root {
+            --bg-deep: #0f0518;
+            --primary-neon: #9d00ff;
+            --accent-cyan: #00e5ff;
+            --text-white: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.05);
+        }
+
+        body { 
+            margin: 0; 
+            background-color: var(--bg-deep); 
+            color: var(--text-white);
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Menu Lateral Alumed */
+        .sidebar {
+            width: 300px;
+            background: linear-gradient(180deg, #1a0b2e 0%, #0f0518 100%);
+            padding: 30px;
+            border-right: 1px solid var(--primary-neon);
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+        }
+
+        .logo-alumed {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: var(--text-white);
+            margin-bottom: 40px;
+        }
+
+        .card-info {
+            background: var(--card-bg);
+            border-left: 4px solid var(--accent-cyan);
+            padding: 20px;
+            border-radius: 4px;
+        }
+
+        /* Área do Microscópio */
+        #openseadragon1 {
+            flex-grow: 1;
+            background-color: #000;
+            position: relative;
+        }
+
+        /* Botões de Ação */
+        .controls {
+            position: absolute;
+            bottom: 30px;
+            left: 330px;
+            display: flex;
+            gap: 15px;
+            z-index: 20;
+        }
+
+        .btn-alumed {
+            background: transparent;
+            border: 2px solid var(--primary-neon);
+            color: var(--text-white);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            text-transform: uppercase;
+        }
+
+        .btn-alumed:hover {
+            background: var(--primary-neon);
+            box-shadow: 0 0 15px var(--primary-neon);
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo-alumed">ALUMED</div>
+        <div class="card-info">
+            <h3 style="color: var(--accent-cyan);">Tecido Epitelial</h3>
+            <p style="font-size: 14px; line-height: 1.6; opacity: 0.8;">
+                Use o mouse ou os botões abaixo para navegar. O Deep Zoom permite visualizar detalhes nucleares sem perda de qualidade.
+            </p>
+        </div>
+    </div>
+
+    <div id="openseadragon1"></div>
+
+    <div class="controls">
+        <button class="btn-alumed" id="zoom-in">Recorrer (+)</button>
+        <button class="btn-alumed" id="zoom-out">Afastar (-)</button>
+        <button class="btn-alumed" id="reset">Resetar</button>
+    </div>
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
+    <script>
+        var viewer = OpenSeadragon({
+            id: "openseadragon1",
+            prefixUrl: "https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/images/",
+            showNavigationControl: false, // Escondemos o padrão para usar os nossos botões
+            tileSources: "{% static 'lamina_pronta.dzi' %}"
+        });
+
+        // Fazendo os botões funcionarem
+        document.getElementById('zoom-in').onclick = function() {
+            viewer.viewport.zoomBy(1.2);
+            viewer.viewport.applyConstraints();
+        };
+        document.getElementById('zoom-out').onclick = function() {
+            viewer.viewport.zoomBy(0.8);
+            viewer.viewport.applyConstraints();
+        };
+        document.getElementById('reset').onclick = function() {
+            viewer.viewport.goHome();
+        };
+    </script>
+</body>
+</html>

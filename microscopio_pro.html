@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microscópio Virtual - Alumed</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- DESIGN SYSTEM ALUMED --- */
+        :root {
+            --bg-deep: #0f0518;       /* Fundo principal escuro */
+            --bg-card: #1a0b2e;       /* Fundo dos cards */
+            --primary-neon: #9d00ff;  /* Roxo Neon (Botões) */
+            --accent-cyan: #00e5ff;   /* Ciano (Detalhes) */
+            --text-white: #ffffff;
+            --text-gray: #b0b0b0;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-deep);
+            color: var(--text-white);
+            font-family: 'Open Sans', sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- CABEÇALHO (Estilo Navbar Alumed) --- */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 40px;
+            background: rgba(15, 5, 24, 0.95);
+            border-bottom: 1px solid rgba(157, 0, 255, 0.2);
+            z-index: 10;
+        }
+
+        .logo {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 24px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-white);
+            background: linear-gradient(90deg, #fff, #e0e0e0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-voltar {
+            background: transparent;
+            border: 2px solid var(--primary-neon);
+            color: var(--text-white);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .btn-voltar:hover {
+            background: var(--primary-neon);
+            box-shadow: 0 0 15px var(--primary-neon);
+        }
+
+        /* --- LAYOUT PRINCIPAL (Grid) --- */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            height: calc(100vh - 70px);
+        }
+
+        /* --- ÁREA DO VISUALIZADOR (Esquerda) --- */
+        .viewer-container {
+            position: relative;
+            background-color: #000;
+            overflow: hidden;
+            cursor: grab;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .viewer-container:active {
+            cursor: grabbing;
+        }
+
+        #imagem-lamina {
+            position: absolute;
+            transform-origin: 0 0;
+            filter: contrast(1.3) brightness(1.0) saturate(1.1);
+            image-rendering: crisp-edges;
+        }
+
+        .zoom-badge {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 12px;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* --- ÁREA DE NOTAS (Direita - Estilo Card Alumed) --- */
+        .notes-panel {
+            background-color: var(--bg-card);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: -5px 0 20px rgba(0,0,0,0.5);
+            overflow-y: auto;
+        }
+
+        .notes-title {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 22px;
+            margin-bottom: 10px;
+            color: var(--accent-cyan);
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
+        }
+
+        .notes-subtitle {
+            font-size: 14px;
+            color: var(--text-gray);
+            margin-bottom: 25px;
+            line-height: 1.6;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 15px;
+        }
+
+        .professor-notes {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(157, 0, 255, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .professor-notes h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 16px;
+            color: var(--primary-neon);
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .note-content {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #ddd;
+        }
+
+        .highlight {
+            color: var(--accent-cyan);
+            font-weight: bold;
+        }
+
+        .footer-note {
+            margin-top: auto;
+            font-size: 11px;
+            color: #666;
+            text-align: center;
+            padding-top: 20px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 3px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">ALUMED</div> 
+        <a href="index.html" class="btn-voltar">Voltar para Cursos</a>
+    </header>
+
+    <div class="main-layout">
+        
+        <div class="viewer-container" id="container">
+            <img id="imagem-lamina" alt="Lâmina de Histologia">
+            
+            <div class="zoom-badge">
+                🖱️ Scroll p/ Zoom • Arraste p/ Mover
+            </div>
+        </div>
+
+        <aside class="notes-panel">
+            <div class="notes-title" id="lamina-titulo">Carregando...</div>
+            <div class="notes-subtitle" id="lamina-info">
+                Carregando informações...
+            </div>
+
+            <div class="professor-notes">
+                <h3>🔍 Notas do Professor</h3>
+                <div class="note-content" id="professor-notas">
+                    <p>Carregando anotações...</p>
+                </div>
+            </div>
+
+            <div class="professor-notes" style="border-color: var(--accent-cyan);">
+                <h3>💡 Dica de Prova</h3>
+                <div class="note-content">
+                    Clique em "Anterior/Próxima" para explorar outras lâminas e sua estrutura histológica.
+                </div>
+            </div>
+
+            <div class="footer-note">
+                © 2026 Instituto Alumed - Tecnologia Conecta FCM
+            </div>
+        </aside>
+
+    </div>
+
+    <script>
+        const container = document.getElementById('container');
+        const img = document.getElementById('imagem-lamina');
+
+        let scale = 1;
+        let pointX = 0;
+        let pointY = 0;
+        let startX = 0;
+        let startY = 0;
+        let panning = false;
+        let laminasData = [];
+        let currentLaminaIndex = 0;
+
+        // CARREGAR DADOS DAS LÂMINAS
+        async function loadLaminasData() {
+            try {
+                const response = await fetch('laminas_data.json');
+                const data = await response.json();
+                laminasData = data.laminas;
+                
+                // Adicionar imagens locais
+                const localImagens = [
+                    { nome: 'Lâmina HD Local', url: 'imagens_laminas/lamina_amiguinho_hd.jpg' },
+                    { nome: 'Leeds 001 - Tecido', url: 'imagens_laminas/lamina_leeds_001.png' },
+                    { nome: 'Leeds 002 - Célula', url: 'imagens_laminas/lamina_leeds_002.png' },
+                    { nome: 'Leeds 003 - Fibras', url: 'imagens_laminas/lamina_leeds_003.png' },
+                    { nome: 'Leeds 005 - Órgão', url: 'imagens_laminas/lamina_leeds_005.jpg' },
+                    { nome: 'Leeds 007 - Estrutura', url: 'imagens_laminas/lamina_leeds_007.png' }
+                ];
+                
+                laminasData = laminasData.concat(localImagens);
+                console.log('✅ ' + laminasData.length + ' lâminas carregadas!');
+                
+                if (laminasData.length > 0) {
+                    loadLamina(0);
+                }
+            } catch (error) {
+                console.error('❌ Erro:', error);
+                document.getElementById('lamina-titulo').textContent = 'Erro ao carregar';
+            }
+        }
+
+        function loadLamina(index) {
+            if (!laminasData || laminasData.length === 0) return;
+            
+            currentLaminaIndex = index;
+            const lamina = laminasData[index];
+            
+            img.src = lamina.url;
+            img.onload = () => {
+                console.log('✅ Lâmina ' + (index + 1) + ' carregada');
+                centerImage();
+            };
+            
+            img.onerror = () => {
+                console.log('⚠️ Lâmina não carregou');
+                if (currentLaminaIndex < laminasData.length - 1) {
+                    loadLamina(currentLaminaIndex + 1);
+                }
+            };
+            
+            document.getElementById('lamina-titulo').textContent = lamina.nome || 'Lâmina ' + (index + 1);
+            document.getElementById('lamina-info').textContent = 'Aumento: 40x • Coloração: HE (Hematoxilina e Eosina)';
+            document.getElementById('professor-notas').innerHTML = '<p>Observe a estrutura histológica desta lâmina. Explore com o zoom para visualizar os detalhes celulares e nucleares.</p>';
+        }
+
+        function nextLamina() {
+            if (laminasData.length > 0) {
+                loadLamina((currentLaminaIndex + 1) % laminasData.length);
+            }
+        }
+
+        function prevLamina() {
+            if (laminasData.length > 0) {
+                loadLamina((currentLaminaIndex - 1 + laminasData.length) % laminasData.length);
+            }
+        }
+
+        function centerImage() {
+            const containerRect = container.getBoundingClientRect();
+            const scaleX = containerRect.width / img.width;
+            const scaleY = containerRect.height / img.height;
+            scale = Math.min(scaleX, scaleY, 1);
+            
+            pointX = (containerRect.width - img.width * scale) / 2;
+            pointY = (containerRect.height - img.height * scale) / 2;
+            
+            updateTransform();
+        }
+
+        // Zoom com Scroll
+        container.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const rect = container.getBoundingClientRect();
+            const xs = (e.clientX - rect.left - pointX) / scale;
+            const ys = (e.clientY - rect.top - pointY) / scale;
+            const delta = -Math.sign(e.deltaY);
+            const step = 0.15;
+
+            if (delta > 0) {
+                scale = Math.min(10, scale * (1 + step));
+            } else {
+                scale = Math.max(0.1, scale / (1 + step));
+            }
+
+            pointX = (e.clientX - rect.left) - xs * scale;
+            pointY = (e.clientY - rect.top) - ys * scale;
+            updateTransform();
+        });
+
+        // Arrastar (Pan)
+        container.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            startX = e.clientX - pointX;
+            startY = e.clientY - pointY;
+            panning = true;
+            container.style.cursor = 'grabbing';
+        });
+
+        window.addEventListener('mouseup', () => {
+            panning = false;
+            container.style.cursor = 'grab';
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!panning) return;
+            e.preventDefault();
+            pointX = e.clientX - startX;
+            pointY = e.clientY - startY;
+            updateTransform();
+        });
+
+        function updateTransform() {
+            img.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
+        }
+
+        // Atalhos de teclado
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextLamina();
+            if (e.key === 'ArrowLeft') prevLamina();
+        });
+
+        // Init
+        window.addEventListener('load', () => {
+            loadLaminasData();
+        });
+    </script>
+
+</body>
+</html>

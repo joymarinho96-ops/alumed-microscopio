@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizador Alumed</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #f0f2f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            color: white;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .viewer-wrapper {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .laminas-img {
+            max-width: 90%;
+            max-height: 80vh;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            cursor: zoom-in;
+            margin-top: 20px;
+            transition: transform 0.2s ease;
+        }
+        
+        .laminas-img:hover {
+            transform: scale(1.02);
+        }
+        
+        .info-text {
+            color: #666;
+            margin-top: 20px;
+            font-size: 1.05em;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #999;
+            font-size: 0.9em;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+            
+            .laminas-img {
+                max-width: 100%;
+            }
+            
+            .viewer-wrapper {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔬 Visualizador de Lâminas ALUMED</h1>
+            <p>Clique na imagem para expandir e explorar em alta definição</p>
+        </header>
+        
+        <div class="viewer-wrapper">
+            {% load static %}
+            <img src="{% static 'images/histopathology.png' %}" class="laminas-img" id="zoom-img" alt="Lâmina histopatológica">
+            <p class="info-text">💡 Dica: Use a roda do mouse ou trackpad para navegar com zoom</p>
+        </div>
+        
+        <div class="footer">
+            <p>© 2026 ALUMED - Plataforma de Visualização Histopatológica</p>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/medium-zoom@1.0.6/dist/medium-zoom.min.js"></script>
+    <script>
+        // Ativa o zoom na imagem com id="zoom-img"
+        mediumZoom('#zoom-img', {
+            margin: 24,
+            background: '#ffffff',
+            scrollOffset: 0
+        });
+        
+        // Log para verificar que o script foi carregado
+        console.log('✅ Visualizador ALUMED carregado com sucesso');
+    </script>
+
+</body>
+</html>

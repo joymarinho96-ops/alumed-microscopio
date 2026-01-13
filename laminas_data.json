@@ -1,38 +1,49 @@
 {
-  "source": "University of Leeds",
-  "total": 8,
+  "source": "ALUMED - Local HD",
+  "total": 10,
   "laminas": [
     {
-      "nome": "Lâmina",
-      "url": "http://www.histo.ufrj.br/LIB/lamina 07 embriao galinha mini.jpg"
+      "nome": "Epitelial",
+      "url": "lamina_usuario.png",
+      "aumento": "40x",
+      "coloracao": "H&E",
+      "descricao": "Epitélio cilíndrico estratificado com núcleos"
     },
     {
-      "nome": "Lâmina",
-      "url": "http://www.histo.ufrj.br/LIB/reconstrucao mini.JPG"
+      "nome": "Lâmina HD 0",
+      "url": "imagens_laminas/lamina_0.jpg"
     },
     {
-      "nome": "Lâmina",
-      "url": "http://www.histo.ufrj.br/LIB/cordao umbilical BD mini.jpg"
+      "nome": "Lâmina Amiguinho HD",
+      "url": "imagens_laminas/lamina_amiguinho_hd.jpg"
     },
     {
-      "nome": "Lâmina",
-      "url": "http://www.histo.ufrj.br/LIB/lam_03_mini.jpg"
+      "nome": "Lâmina Leeds 005",
+      "url": "imagens_laminas/lamina_leeds_005.jpg"
     },
     {
-      "nome": "Lâmina",
-      "url": "http://www.histo.ufrj.br/LIB/mastocitoma BD mini.jpg"
+      "nome": "Lâmina Leeds 006",
+      "url": "imagens_laminas/lamina_leeds_006.jpg"
     },
     {
-      "nome": "Lâmina",
-      "url": "http://www.histo.ufrj.br/LIB/ileojejuno BD mini.jpg"
+      "nome": "Lâmina Leeds 009",
+      "url": "imagens_laminas/lamina_leeds_009.jpg"
     },
     {
-      "nome": "Lâmina",
-      "url": "http://www.histo.ufrj.br/LIB/articulacao_cotovelo_thumb.jpg"
+      "nome": "Lâmina Leeds 010",
+      "url": "imagens_laminas/lamina_leeds_010.jpg"
     },
     {
-      "nome": "Lâmina",
-      "url": "http://www.histo.ufrj.br/LIB/coluna vertebral BD mini.jpg"
+      "nome": "Lâmina Leeds 011",
+      "url": "imagens_laminas/lamina_leeds_011.jpg"
+    },
+    {
+      "nome": "Lâmina Leeds 014",
+      "url": "imagens_laminas/lamina_leeds_014.jpg"
+    },
+    {
+      "nome": "Lâmina Leeds 016",
+      "url": "imagens_laminas/lamina_leeds_016.jpg"
     }
   ]
 }

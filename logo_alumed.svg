@@ -1,0 +1,31 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Círculo amarelo externo -->
+  <circle cx="100" cy="100" r="95" fill="#FFD700" stroke="#FFC700" stroke-width="2"/>
+  
+  <!-- Texto na borda -->
+  <defs>
+    <path id="circlePath" d="M 30, 100 A 70, 70 0 0,1 170, 100" fill="none"/>
+    <path id="circlePathBottom" d="M 170, 100 A 70, 70 0 0,1 30, 100" fill="none"/>
+  </defs>
+  
+  <!-- Texto superior -->
+  <text font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="white" letter-spacing="4">
+    <textPath href="#circlePath" startOffset="50%" text-anchor="middle">
+      INSTITUTO ALUMED
+    </textPath>
+  </text>
+  
+  <!-- Texto inferior -->
+  <text font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="white" letter-spacing="4">
+    <textPath href="#circlePathBottom" startOffset="50%" text-anchor="middle">
+      INCLUSINI
+    </textPath>
+  </text>
+  
+  <!-- Círculo branco interno -->
+  <circle cx="100" cy="100" r="65" fill="none" stroke="white" stroke-width="3"/>
+  
+  <!-- Batida do coração (cardiograma) -->
+  <path d="M 50 100 L 65 100 L 70 85 L 75 105 L 80 85 L 90 105 L 100 90 L 110 100 L 150 100" 
+        stroke="white" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

@@ -1,0 +1,54 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alumed - Microscopia Ultra HD</title>
+    <style>
+        :root { --bg: #0f0518; --neon: #9d00ff; --cyan: #00e5ff; }
+        body { margin: 0; background-color: var(--bg); color: white; display: flex; height: 100vh; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+        .sidebar { width: 300px; background: linear-gradient(180deg, #1a0b2e 0%, #0f0518 100%); padding: 30px; border-right: 1px solid var(--neon); z-index: 10; }
+        .logo { font-size: 24px; font-weight: 800; margin-bottom: 30px; color: white; letter-spacing: 2px; }
+        .info-card { background: rgba(255,255,255,0.05); padding: 15px; border-left: 4px solid var(--cyan); border-radius: 4px; }
+        #openseadragon1 { flex-grow: 1; background: #000; position: relative; }
+        .controls { position: absolute; bottom: 30px; left: 330px; display: flex; gap: 15px; z-index: 20; }
+        .btn-alumed { background: transparent; border: 2px solid var(--neon); color: white; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-alumed:hover { background: var(--neon); box-shadow: 0 0 15px var(--neon); }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">ALUMED</div>
+        <div class="info-card">
+            <h3 style="color: var(--cyan); margin-top: 0;">Lâmina Digital</h3>
+            <p style="font-size: 14px; opacity: 0.8;">Use os controles para explorar a amostra em alta resolução.</p>
+        </div>
+    </div>
+
+    <div id="openseadragon1"></div>
+
+    <div class="controls">
+        <button class="btn-alumed" id="zoom-in">Recorrer (+)</button>
+        <button class="btn-alumed" id="zoom-out">Afastar (-)</button>
+        <button class="btn-alumed" id="reset">Resetar</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
+    <script>
+        // Limpeza total de segurança
+        if (window.viewer) { window.viewer.destroy(); }
+
+        window.viewer = OpenSeadragon({
+            id: "openseadragon1",
+            prefixUrl: "https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/images/",
+            showNavigationControl: false,
+            tileSources: "{% static 'images/lamina_pronta.dzi' %}"
+        });
+
+        document.getElementById('zoom-in').onclick = function() { window.viewer.viewport.zoomBy(1.2); };
+        document.getElementById('zoom-out').onclick = function() { window.viewer.viewport.zoomBy(0.8); };
+        document.getElementById('reset').onclick = function() { window.viewer.viewport.goHome(); };
+    </script>
+</body>
+</html>

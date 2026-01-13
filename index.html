@@ -6,6 +6,7 @@
     <title>Alumed - Microscópio Histológico</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #f5f5f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -37,12 +38,24 @@
             border-bottom: 1px solid #ddd;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .header-logo {
+            width: 80px;
+            height: 80px;
+            flex-shrink: 0;
         }
         
         .header h1 {
-            font-size: 28px;
+            font-size: 36px;
             font-weight: 700;
             margin: 0;
+            font-family: 'Bungee', cursive;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
         }
         
         .header p {
@@ -240,6 +253,9 @@
                 <button class="btn" onclick="toggleFullscreen()">
                     <i class="fas fa-expand"></i> Fullscreen
                 </button>
+                <button class="btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-color: #667eea;" onclick="openAdvancedViewer()">
+                    <i class="fas fa-eye"></i> Visualizador Pro
+                </button>
             </div>
 
             <div class="section">
@@ -260,8 +276,11 @@
         <!-- MAIN VIEWER -->
         <div class="main">
             <div class="header">
-                <h1><i class="fas fa-microscope"></i> Alumed - Microscópio Histológico</h1>
-                <p>Visualizador de lâminas com imagens públicas de alta qualidade</p>
+                <img src="logo_alumed.svg" alt="ALUMED" class="header-logo">
+                <div>
+                    <h1>ALUMED</h1>
+                    <p>Microscópio Histológico • Instituto Alumed Inclusioni</p>
+                </div>
             </div>
 
             <div class="viewer">
@@ -278,61 +297,33 @@
     </div>
 
     <script>
-        // Dados das lâminas do UFRJ
-        const laminas = [
-            {
-                title: "Traqueia e Esôfago",
-                desc: "Aumento: 10x | Visão geral da traqueia e esôfago",
-                url: "http://www.histo.ufrj.br/LIB/Lamina%2015%20Traqueia%20e%20Esofago%2010x/Lamina%2015.htm",
-                type: "iframe"
-            },
-            {
-                title: "Pele",
-                desc: "Epiderme e derme - Microscopia histológica",
-                url: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Skin_structure.svg/800px-Skin_structure.svg.png",
-                type: "image"
-            },
-            {
-                title: "Sangue",
-                desc: "Células sanguíneas e plaquetas",
-                url: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Micrograph_of_human_blood.jpg/800px-Micrograph_of_human_blood.jpg",
-                type: "image"
-            },
-            {
-                title: "Tecido Conjuntivo",
-                desc: "Fibras colágenas e fibroblastos",
-                url: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Dens_regular_connective_tissue.jpg/800px-Dens_regular_connective_tissue.jpg",
-                type: "image"
-            },
-            {
-                title: "Músculo Esquelético",
-                desc: "Fibras musculares estriadas",
-                url: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Skeletal_muscle_fibers.jpg/800px-Skeletal_muscle_fibers.jpg",
-                type: "image"
-            },
-            {
-                title: "Osso",
-                desc: "Osteócitos em matriz mineral",
-                url: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Compact_bone_cross_section.jpg/800px-Compact_bone_cross_section.jpg",
-                type: "image"
-            }
-        ];
-
+        let laminas = [];
         let currentZoom = 1;
+
+        // Carregar dados das lâminas do JSON
+        async function loadLaminasData() {
+            try {
+                const response = await fetch('laminas_data.json');
+                const data = await response.json();
+                laminas = data.laminas;
+                console.log(`✅ ${laminas.length} lâminas carregadas`);
+                generateSelector();
+                if (laminas.length > 0) loadLamina(0);
+            } catch (error) {
+                console.error('Erro ao carregar lâminas:', error);
+            }
+        }
 
         // Carregar lâmina
         function loadLamina(index) {
             const lamina = laminas[index];
-            document.getElementById('lamina-title').textContent = lamina.title;
-            document.getElementById('lamina-desc').textContent = lamina.desc;
+            if (!lamina) return;
+            
+            document.getElementById('lamina-title').textContent = lamina.nome;
+            document.getElementById('lamina-desc').textContent = "University of Leeds - Domínio Público";
             
             const container = document.querySelector('.image-container');
-            
-            if (lamina.type === 'iframe') {
-                container.innerHTML = `<iframe src="${lamina.url}" style="width: 95%; height: 95%; border: 1px solid #ddd; border-radius: 8px;"></iframe>`;
-            } else {
-                container.innerHTML = `<img id="lamina-viewer" src="${lamina.url}" style="max-width: 95%; max-height: 95%; object-fit: contain; background: #f9f9f9; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">`;
-            }
+            container.innerHTML = `<img id="lamina-viewer" src="${lamina.url}" style="max-width: 95%; max-height: 95%; object-fit: contain; background: #f9f9f9; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">`;
             
             // Update active thumb
             document.querySelectorAll('.lamina-thumb').forEach((t, i) => {
@@ -343,10 +334,12 @@
         // Gerar seletor de lâminas
         function generateSelector() {
             const selector = document.getElementById('lamina-selector');
+            selector.innerHTML = '';
             laminas.forEach((lamina, index) => {
                 const thumb = document.createElement('div');
                 thumb.className = 'lamina-thumb' + (index === 0 ? ' active' : '');
-                thumb.innerHTML = `<img src="${lamina.url}" alt="${lamina.title}">`;
+                thumb.title = lamina.nome;
+                thumb.innerHTML = `<img src="${lamina.url}" alt="${lamina.nome}" style="width: 100%; height: 100%; object-fit: cover;">`;
                 thumb.onclick = () => loadLamina(index);
                 selector.appendChild(thumb);
             });
@@ -354,48 +347,65 @@
 
         // Zoom
         function zoomIn() {
-            currentZoom += 0.2;
-            applyZoom();
+            const viewer = document.querySelector('.image-container img');
+            if (viewer) {
+                currentZoom += 0.2;
+                viewer.style.transform = `scale(${currentZoom})`;
+            }
         }
 
         function zoomOut() {
-            if (currentZoom > 0.5) {
+            const viewer = document.querySelector('.image-container img');
+            if (viewer && currentZoom > 0.5) {
                 currentZoom -= 0.2;
-                applyZoom();
+                viewer.style.transform = `scale(${currentZoom})`;
             }
         }
 
         function zoomReset() {
-            currentZoom = 1;
-            applyZoom();
-        }
-
-        function applyZoom() {
-            const viewer = document.getElementById('lamina-viewer');
-            viewer.style.transform = `scale(${currentZoom})`;
+            const viewer = document.querySelector('.image-container img');
+            if (viewer) {
+                currentZoom = 1;
+                viewer.style.transform = `scale(1)`;
+            }
         }
 
         // Download
         function downloadImage() {
-            const link = document.createElement('a');
-            link.href = document.getElementById('lamina-viewer').src;
-            link.download = 'lamina_histologica.png';
-            link.click();
+            const viewer = document.querySelector('.image-container img');
+            if (viewer) {
+                const link = document.createElement('a');
+                link.href = viewer.src;
+                link.download = 'lamina_histologica.png';
+                link.click();
+            }
         }
 
         // Fullscreen
         function toggleFullscreen() {
-            const viewer = document.getElementById('lamina-viewer');
-            if (!document.fullscreenElement) {
+            const viewer = document.querySelector('.image-container img');
+            if (viewer && !document.fullscreenElement) {
                 viewer.requestFullscreen().catch(err => alert('Fullscreen não disponível'));
-            } else {
+            } else if (document.fullscreenElement) {
                 document.exitFullscreen();
             }
         }
 
-        // Init
-        generateSelector();
-        loadLamina(0);
+        // Abrir Visualizador Pro com watermark
+        function openAdvancedViewer() {
+            const viewer = document.querySelector('.image-container img');
+            if (!viewer || !viewer.src) {
+                alert('Carregue uma lâmina primeiro!');
+                return;
+            }
+            
+            // Abre o visualizador avançado em nova aba
+            const windowFeatures = "width=1200,height=800,menubar=no,toolbar=no,location=no,status=no";
+            window.open('visualizador_laminas.html', 'advancedViewer', windowFeatures);
+        }
+
+        // Init - carregar dados e exibir
+        loadLaminasData();
     </script>
 </body>
 </html>
